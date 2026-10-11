@@ -10,8 +10,7 @@ Le problème modélise la sélection d'acquisitions mono et stéréo, l'affectat
 
 L'application interactive est déployée et accessible directement dans votre navigateur :
 
-👉 **[https://sat-scheduler.streamlit.app/](https://sat-scheduler.streamlit.app/)**
-
+👉 [satellite-scheduler-m2-iafa.streamlit.app](https://satellite-scheduler-m2-iafa.streamlit.app/)
 L'interface web permet de :
 - Sélectionner les instances de test (`spotProba1` à `spotProba5`).
 - Ajuster les scénarios de décision sous incertitude (Wald / pessimiste, Laplace / moyen, Maximax / optimiste, déterministe).
