@@ -1,0 +1,49 @@
+\contentsline {section}{\numberline {1}Introduction \& Contexte Opérationnel de la Mission SPOT-5}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Architecture de la Charge Utile Optique}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Typologie des Demandes et Contraintes Opérationnelles}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Problématique Décisionnelle et Facteurs Limitants}{4}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Modélisation Mathématique du Problème de Planification}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Ensembles et Indices}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Paramètres du Modèle}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Variables de Décision}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Contraintes du Modèle Linéaire}{5}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}1. Cohérence d'Affectation et Spécificité Stéréo}{5}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}2. Capacité Mémoire de Masse Embarquée}{6}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}3. Non-Chevauchement Temporel et Cinématique de Rotation des Miroirs}{6}{subsubsection.2.4.3}%
+\contentsline {subsection}{\numberline {2.5}Fonction Objectif Déterministe (Sans Incertitude)}{6}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Traitement Théorique de l'Incertitude \& Critères de Décision}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Modélisation des Deux Sources d'Incertitude}{7}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}1. Incertitude Météorologique (Couverture Nuageuse)}{7}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}2. Fiabilité et Défaillance des Instruments}{7}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Comparaison des Critères de Décision Face à l'Incertitude}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Formulation de l'Espérance Mathématique du Gain dans l'Objectif}{7}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Pour une image Monoscopique ($TY_i = 1$)}{8}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Pour une image Stéréoscopique ($TY_i = 2$)}{8}{subsubsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.4}Fonction Objectif Globale Maximisée}{8}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Justification Théorique du Choix Retenu}{8}{subsection.3.5}%
+\contentsline {section}{\numberline {4}Implémentation Logicielle \& Déclaration d'Usage de l'IA}{8}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Architecture du Moteur d'Optimisation}{8}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Illustration du Code Clé de Modélisation}{8}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Interface Utilisateur Interactive (Streamlit \& Plotly)}{9}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Déclaration de Transparence sur l'Usage de l'Intelligence Artificielle}{9}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Validation Expérimentale sur les Instances Élémentaires}{9}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Description des Trois Configurations de Test}{10}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Résultats Numériques et Conformité aux Valeurs Théoriques}{10}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Validation des Variantes Stochastiques sur \texttt {spotProba1}}{10}{subsection.5.3}%
+\contentsline {section}{\numberline {6}Résultats et Analyse Approfondie sur \texttt {spotProba4}}{10}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Comparaison des Plans selon la Politique Météorologique}{11}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Planning Détaillé d'Acquisition (Scénario Pessimiste)}{11}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Analyse Critique des Résultats}{11}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Résultats et Analyse Approfondie sur \texttt {spotProba5}}{12}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Comparaison des Plans Multi-Scénarios sur \texttt {spotProba5}}{12}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Impact Déterminant de la Défaillance de l'Instrument 3}{12}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Analyse Détaillée des Phénomènes Observés}{12}{subsection.7.3}%
+\contentsline {section}{\numberline {8}Analyse de Robustesse \& Étude de Sensibilité}{13}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Analyse de Robustesse des Décisions d'Acquisition}{13}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Sensibilité à la Vitesse de Rotation du Miroir ($V_I$)}{13}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Sensibilité à la Capacité Mémoire Embarquée ($PM_{\max }$)}{13}{subsection.8.3}%
+\contentsline {section}{\numberline {9}Conclusion \& Limites du Modèle}{14}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Bilan des Apports du Modèle}{14}{subsection.9.1}%
+\contentsline {subsubsection}{\numberline {9.1.1}Ce que le modèle permet de conclure :}{14}{subsubsection.9.1.1}%
+\contentsline {subsection}{\numberline {9.2}Limites du Modèle \& Perspectives d'Extension}{14}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Mot de Fin}{15}{subsection.9.3}%

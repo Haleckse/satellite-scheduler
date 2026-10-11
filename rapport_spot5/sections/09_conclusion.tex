@@ -1,0 +1,17 @@
+\section{Conclusion et Limites du Modèle}
+
+\subsection{Ce que le modèle permet de conclure}
+L'approche par programmation linéaire en nombres entiers (PLNE) proposée s'avère bien adaptée au problème de planification d'acquisitions pour SPOT-5 :
+\begin{itemize}
+    \item Résolution exacte très rapide : Le solveur SCIP trouve l'optimum prouvé en moins de $25\text{ ms}$ sur l'instance à 20 images, et en $14\text{ ms}$ sur celle à 40 images. Ces temps de calcul sont tout à fait compatibles avec une utilisation opérationnelle quotidienne au centre de contrôle au sol.
+    \item Arbitrages clairs sous incertitude : En formulant l'espérance de gain dans l'objectif, le modèle arbitre rationnellement entre le gain facial, la probabilité de nébulosité et la mémoire consommée. Il élimine de lui-même les images stéréo quand leur risque nuageux est trop élevé, et réaffecte spontanément la charge sur les instruments sains en cas de panne matérielle.
+    \item Aide à la décision : L'analyse de robustesse permet à l'opérateur d'identifier les images à confirmer sans risque (robustes) et celles qui dépendent fortement de la fiabilité des prévisions météo.
+\end{itemize}
+
+\subsection{Ce que le modèle ne permet pas de conclure}
+Certaines hypothèses du modèle constituent des limites pratiques qu'il convient de garder à l'esprit :
+\begin{itemize}
+    \item Planification statique hors-ligne : Le plan est calculé au sol avant la passe du satellite. Le modèle ne permet pas une replanification dynamique à bord en temps réel si une caméra de nébulosité embarquée détecte une zone dégagée imprévue.
+    \item Indépendance spatiale des nuages : Nous supposons que les probabilités de nuages sont indépendantes d'une image à l'autre. En réalité, deux cibles voisines sont souvent couvertes par la même masse nuageuse. Une modélisation par scénarios météo corrélés permettrait d'affiner encore ce point.
+    \item Passage à l'échelle pour de très grands problèmes : Sur un horizon pluri-journalier ou pour une constellation complète de satellites (plusieurs centaines ou milliers d'images), le nombre de contraintes disjonctives (\ref{eq:disjonction}) augmenterait de façon quadratique. Il deviendrait alors pertinent d'explorer des méthodes de décomposition (comme la décomposition de Benders) ou des heuristiques de recherche locale.
+\end{itemize}

@@ -1,0 +1,37 @@
+\section{Implémentation et Utilisation de l'IA}
+
+\subsection{Architecture Logicielle}
+Le projet est développé en Python avec le solveur de programmation mathématique SCIP via la bibliothèque \texttt{PySCIPOpt}. Le code est structuré en deux modules principaux :
+\begin{itemize}
+    \item \texttt{spot\_solver.py} : Contient la classe \texttt{SpotInstance} pour charger les données et détecter les conflits cinématiques, ainsi que la fonction \texttt{solve\_spot} qui instancie les variables, pose les contraintes et résout le modèle avec SCIP.
+    \item \texttt{app.py} : Une interface web développée avec Streamlit et Plotly permettant de visualiser le diagramme de Gantt des acquisitions, d'inspecter les conflits, de comparer les scénarios météo et d'exporter les plannings en CSV/JSON.
+    \item \texttt{benchmark\_report.py} : Un script d'automatisation exécutant l'ensemble des scénarios et variations paramétriques pour collecter les indicateurs d'optimisation.
+\end{itemize}
+
+\subsection{Extrait de code de la modélisation}
+L'extrait suivant illustre la construction de la fonction objectif avec prise en compte des probabilités dans le code :
+
+\begin{verbatim}
+# Calcul des termes de l'espérance de gain
+obj_terms = []
+for i in range(nb_images):
+    if instance.TY[i] == 1:
+        # Mono : dépend de l'instrument choisi et de son taux de panne
+        for j in range(nb_instruments):
+            coef = instance.PA[i] * p_clear[i] * (1.0 - failure[j])
+            obj_terms.append(coef * assigned_to[i][j])
+    else:
+        # Stéréo : requiert simultanément les instruments 0 et 2
+        f0, f2 = failure[0], failure[2]
+        coef = instance.PA[i] * p_clear[i] * (1.0 - f0) * (1.0 - f2)
+        obj_terms.append(coef * selection[i])
+
+model.setObjective(quicksum(obj_terms), sense="maximize")
+\end{verbatim}
+
+\subsection{Mention de l'Usage de l'IA}
+Conformément aux consignes du cours :
+\begin{itemize}
+    \item Ce qui a été fait avec l'IA : Nous avons utilisé un assistant IA pour accélérer le développement de l'interface graphique Streamlit (notamment la mise en forme du graphique de Gantt sous Plotly), pour réaliser le script de benchmark automatisé (\texttt{benchmark\_report.py}) et pour générer la structure du fichier de mise en page \LaTeX.
+    \item Ce qui n'a pas été fait avec l'IA : La formulation du modèle mathématique (variables de décision, contraintes de cohérence stéréo, disjonctions cinématiques, formalisation de l'espérance), le choix des critères sous incertitude ainsi que l'analyse critique des résultats et des arbitrages ont été réalisés directement par nos soins.
+\end{itemize}

@@ -1,0 +1,65 @@
+\section{Modélisation Mathématique (PLNE)}
+
+Nous formulons le problème sous forme d'un programme linéaire en nombres entiers. Cette section présente les ensembles, paramètres, variables de décision et contraintes en notation mathématique.
+
+\subsection{Ensembles et Paramètres}
+\begin{itemize}
+    \item $\mathcal{I} = \{0, \dots, N-1\}$ : ensemble des demandes d'images, partitionné en $\mathcal{I}_{\text{mono}} = \{i \in \mathcal{I} \mid TY_i = 1\}$ et $\mathcal{I}_{\text{stereo}} = \{i \in \mathcal{I} \mid TY_i = 2\}$.
+    \item $\mathcal{J} = \{0, 1, 2\}$ : ensemble des trois instruments (0 pour l'instrument 1 avant, 1 pour l'instrument 2 nadir, 2 pour l'instrument 3 arrière).
+\end{itemize}
+
+Pour chaque image $i \in \mathcal{I}$ et instrument $j \in \mathcal{J}$, les paramètres sont :
+\begin{itemize}
+    \item $PA_i \in \R_+$ : gain financier rapporté par l'image $i$ si elle est réussie.
+    \item $PM_i \in \N^*$ : mémoire requise par l'image $i$ (déjà doublée pour les stéréos dans les données).
+    \item $PM_{\max} \in \N^*$ : capacité mémoire totale disponible à bord.
+    \item $DU \in \N^*$ : durée d'une prise de vue (identique pour toutes les images, en secondes).
+    \item $V_I \in \R_+^*$ : vitesse de rotation du miroir de visée (en degrés par seconde).
+    \item $DD_{i,j} \in \N$ : date de début de l'acquisition de l'image $i$ par l'instrument $j$ (en secondes).
+    \item $AN_{i,j} \in \R$ : angle de dépointage nécessaire pour pointer la cible $i$ avec l'instrument $j$.
+\end{itemize}
+
+\subsection{Variables de Décision}
+Nous définissons deux jeux de variables binaires :
+\begin{itemize}
+    \item $x_i \in \{0, 1\}$ pour tout $i \in \mathcal{I}$ : vaut 1 si l'image $i$ est sélectionnée dans le plan, 0 sinon.
+    \item $y_{i,j} \in \{0, 1\}$ pour tout $i \in \mathcal{I}, j \in \mathcal{J}$ : vaut 1 si l'image $i$ est affectée à l'instrument $j$, 0 sinon.
+\end{itemize}
+
+\subsection{Contraintes de Faisabilité}
+
+\subsubsection{1. Affectation des Images Mono et Stéréo}
+Une image mono sélectionnée doit être affectée à exactement un instrument :
+\begin{equation}
+    \sum_{j \in \mathcal{J}} y_{i,j} = x_i \quad \forall i \in \mathcal{I}_{\text{mono}} \label{eq:mono}
+\end{equation}
+
+Une image stéréo sélectionnée exige obligatoirement les instruments 0 et 2, et interdit l'instrument 1 :
+\begin{align}
+    y_{i,0} &= x_i \quad \forall i \in \mathcal{I}_{\text{stereo}} \label{eq:stereo0} \\
+    y_{i,1} &= 0 \quad \forall i \in \mathcal{I}_{\text{stereo}} \label{eq:stereo1} \\
+    y_{i,2} &= x_i \quad \forall i \in \mathcal{I}_{\text{stereo}} \label{eq:stereo2}
+\end{align}
+
+\subsubsection{2. Capacité Mémoire}
+La somme des tailles des images retenues ne doit pas dépasser la mémoire embarquée :
+\begin{equation}
+    \sum_{i \in \mathcal{I}} PM_i \cdot x_i \leq PM_{\max} \label{eq:mem}
+\end{equation}
+
+\subsubsection{3. Non-Chevauchement et Rotation du Miroir}
+Considérons deux images $i_1 < i_2$ candidates sur un même instrument $j$. Le temps entre leurs débuts doit être suffisant pour réaliser la première prise ($DU$) et faire pivoter le miroir de l'angle $AN_{i_1,j}$ à l'angle $AN_{i_2,j}$ à la vitesse $V_I$ :
+\begin{equation}
+    \Delta t = |DD_{i_1,j} - DD_{i_2,j}| \geq DU + \frac{|AN_{i_1,j} - AN_{i_2,j}|}{V_I}
+\end{equation}
+Sous forme linéaire (sans division), deux images $i_1, i_2$ sont en conflit cinématique sur l'instrument $j$ dès que :
+\begin{equation}
+    |DD_{i_1,j} - DD_{i_2,j}| \cdot V_I < DU \cdot V_I + |AN_{i_1,j} - AN_{i_2,j}| \label{eq:conflit_cond}
+\end{equation}
+Pour chaque paire en conflit sur l'instrument $j$, au plus une des deux peut être allouée à cet instrument :
+\begin{equation}
+    y_{i_1,j} + y_{i_2,j} \leq 1 \label{eq:disjonction}
+\end{equation}
+
+\noindent\textit{Remarque sur les valeurs fictives et l'exclusivité :}
+Pour les images stéréo, la date $DD[i][1]=0$ et l'angle $AN[i][1]=0$ sont de simples valeurs de remplissage dans les données (puisque la stéréo n'utilise jamais le nadir). Ces valeurs fictives sont donc ignorées lors de la génération des conflits cinématiques sur l'instrument 1 pour éviter toute contrainte artificielle. Par ailleurs, la contrainte d'exclusivité (un instrument ne peut réaliser deux acquisitions simultanées) est naturellement couverte par l'inéquation~(\ref{eq:disjonction}), car deux acquisitions simultanées se chevauchent obligatoirement.

@@ -1,0 +1,40 @@
+\section{Validation du Modèle sur Petites Instances}
+
+Pour vérifier nos contraintes et notre fonction objectif, nous avons testé le modèle sur les trois petites instances de test fournies (\texttt{spotProba1}, \texttt{spotProba2}, \texttt{spotProba3}).
+
+\subsection{Description des Cas de Test}
+\begin{itemize}
+    \item \texttt{spotProba1} : Configuration nominale ($PM_{\max} = 50$, $DU = 20\text{ s}$). Les 3 images tiennent en mémoire ($10 + 20 + 10 = 40 \leq 50$) et leurs créneaux temporels ne sont pas en conflit. Le gain optimal attendu est de 70.0.
+    \item \texttt{spotProba2} : La capacité mémoire est réduite à $PM_{\max} = 35$. Il devient impossible de garder les 3 images (coût 40). Le solveur doit choisir les images 1 et 2 (gain $20 + 40 = 60.0$, mémoire 30).
+    \item \texttt{spotProba3} : La durée d'acquisition passe à $DU = 100\text{ s}$. Un conflit temporel apparaît entre l'image 0 et les autres sur les instruments, forçant à écarter l'image 0. Le gain optimal est de 60.0.
+\end{itemize}
+
+\subsection{Résultats Obtenus}
+Le tableau~\ref{tab:validation} résume les résultats obtenus par SCIP. Les valeurs optimales et les sélections d'images correspondent exactement aux attendus de l'énoncé.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{lcccccX}
+\toprule
+\textbf{Instance} & \textbf{$PM_{\max}$} & \textbf{$DU$ (s)} & \textbf{Statut} & \textbf{Gain $\mathbb{E}[\mathcal{Z}]$} & \textbf{Mémoire} & \textbf{Images Retenues} \\
+\midrule
+\texttt{spotProba1} & 50 & 20 & Optimal & 70.0 & 40 / 50 & $\{0, 1, 2\}$ \\
+\texttt{spotProba2} & 35 & 20 & Optimal & 60.0 & 30 / 35 & $\{1, 2\}$ \\
+\texttt{spotProba3} & 50 & 100 & Optimal & 60.0 & 30 / 50 & $\{1, 2\}$ \\
+\bottomrule
+\end{tabularx}
+\caption{Validation sur les trois instances de test de base (sans incertitude).}
+\label{tab:validation}
+\end{table}
+
+\subsection{Tests avec Incertitude sur \texttt{spotProba1}}
+Nous avons également testé les variantes stochastiques commentées dans \texttt{spotProba1.py} :
+\begin{itemize}
+    \item Nuages avec $p=0.10$ constant : Le gain optimal obtenu est $70 \times 0.9 = 63.00$ (valeur attendue : 63).
+    \item Nuages dans $[0.10, 0.30]$ (Pessimiste) : Le gain obtenu est $70 \times 0.7 = 49.00$ (valeur attendue : 49).
+    \item Panne de l'instrument 2 ($Failure=[0, 1, 0]$) : L'instrument nadir étant indisponible, l'image stéréo 1 (instruments 1 et 3) et l'image mono 2 sont sélectionnées. Le gain est de 60.00.
+    \item Incertitudes mixtes sévères : Avec $p^{\sup} = [0.1, 0.5, 0.9]$ et $Failure = [0.01, 0.9, 0.01]$, le modèle donne une espérance de 14.661, ce qui correspond exactement à la valeur théorique mentionnée dans le sujet.
+\end{itemize}
+
+Ces tests confirment que la modélisation des contraintes et du calcul d'espérance est correcte.

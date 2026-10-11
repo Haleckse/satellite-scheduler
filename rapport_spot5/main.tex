@@ -1,0 +1,109 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% Géométrie de page
+\usepackage[top=2.2cm, bottom=2.2cm, left=2.2cm, right=2.2cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.10}
+\usepackage[skip=0.5em plus 0.1em]{parskip}
+
+% Mathématiques
+\usepackage{amsmath, amssymb, amsfonts, mathrsfs, bm}
+
+% Tableaux et graphiques
+\usepackage{booktabs, multirow, tabularx, array, makecell, colortbl}
+\usepackage{xcolor}
+\definecolor{primary}{RGB}{20, 50, 110}
+\definecolor{secondary}{RGB}{0, 110, 180}
+\definecolor{lightgray}{RGB}{245, 247, 250}
+\definecolor{darkgray}{RGB}{60, 65, 75}
+\definecolor{accentred}{RGB}{180, 30, 30}
+
+% TikZ et Pgfplots
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{calc,positioning,shapes.geometric,arrows.meta}
+
+% Flottants et figures
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{font=small, labelfont={bf, color=primary}, skip=4pt}
+\usepackage{subcaption}
+
+% En-têtes et pieds de page
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{darkgray}\textit{M2 IAFA : Planification satellite SPOT-5}}
+\fancyhead[R]{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Liens
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    urlcolor=secondary,
+    citecolor=primary
+}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\B}{\{0, 1\}}
+
+\begin{document}
+
+% -------------------------------------------------------------
+% En-tête du rapport
+% -------------------------------------------------------------
+\begin{center}
+    {\large\scshape Université Paul Sabatier, Master 2 IAFA (IA \& Décision)}\\[0.2cm]
+    {\normalsize Module d'Optimisation et Aide à la Décision}\\[0.5cm]
+    
+    \rule{\linewidth}{0.8pt}\\[0.3cm]
+    {\LARGE\bfseries\color{primary} Planification des prises de vue du satellite SPOT-5}\\[0.15cm]
+    {\large Modélisation en PLNE, prise en compte des incertitudes et résolution avec SCIP}\\[0.2cm]
+    \rule{\linewidth}{0.8pt}\\[0.4cm]
+    
+    \begin{minipage}{0.60\textwidth}
+        \begin{flushleft}
+            \textbf{Étudiants :} Alex \textsc{Tsan}, Paul \textsc{Serratos}, Hadrien \textsc{Lagier}
+        \end{flushleft}
+    \end{minipage}
+    \begin{minipage}{0.36\textwidth}
+        \begin{flushright}
+            \textbf{Enseignante :} Nahla \textsc{Ben Amor}
+        \end{flushright}
+    \end{minipage}
+\end{center}
+
+\renewcommand{\abstractname}{\large\bfseries\color{primary} Résumé}
+
+\begin{abstract}
+    Ce travail porte sur la modélisation et la résolution du problème d'ordonnancement des prises de vue pour un satellite d'observation terrestre (type SPOT-5). Le problème consiste à sélectionner un ensemble d'images (mono ou stéréo) et à les affecter aux trois instruments embarqués afin de maximiser le gain espéré, tout en respectant la capacité mémoire du satellite, les contraintes de non-chevauchement temporel et les temps de dépointage des miroirs. Nous intégrons les incertitudes sur la couverture nuageuse et sur les pannes d'instruments directement dans l'espérance de gain de la fonction objectif. Le modèle est formulé en Programmation Linéaire en Nombres Entiers (PLNE) et résolu avec le solveur SCIP via \texttt{PySCIPOpt}. Nous présentons ensuite la validation sur des petites instances, puis l'analyse détaillée des plans obtenus sur les instances \texttt{spotProba4} et \texttt{spotProba5}, en étudiant notamment la réaction du modèle face à une défaillance instrumentale et aux variations météorologiques.
+\end{abstract}
+
+\vspace{0.3cm}
+\hrule
+\vspace{0.4cm}
+
+% -------------------------------------------------------------
+% Sections du rapport
+% -------------------------------------------------------------
+\input{sections/01_introduction.tex}
+\input{sections/02_modelisation.tex}
+\input{sections/03_incertitude.tex}
+\input{sections/04_implementation_ia.tex}
+\input{sections/05_validation.tex}
+\input{sections/06_resultats_spot4.tex}
+\input{sections/07_resultats_spot5.tex}
+\input{sections/08_robustesse_sensibilite.tex}
+\input{sections/09_conclusion.tex}
+
+\end{document}

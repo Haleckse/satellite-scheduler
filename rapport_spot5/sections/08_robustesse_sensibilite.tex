@@ -1,0 +1,76 @@
+\section{Analyse de Robustesse et Étude de Sensibilité}
+\label{sec:robustesse}
+
+\subsection{Robustesse des choix d'acquisition}
+Pour un opérateur au sol, il est utile de savoir quelles images sont rentables quelle que soit la météo, et lesquelles ne valent la peine que si les conditions sont parfaites. Nous distinguons :
+\begin{itemize}
+    \item Images robustes ($\mathcal{S}_{\text{rob}}$) : Sélectionnées dans tous les scénarios météo (Pessimiste, Moyen, Optimiste, Déterministe).
+    \item Images conditionnelles ($\mathcal{S}_{\text{cond}}$) : Retenues seulement lorsque les prévisions de nébulosité sont favorables.
+\end{itemize}
+
+Le tableau~\ref{tab:robustesse} détaille cette répartition sur les deux instances principales.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{lccl}
+\toprule
+\textbf{Instance} & \textbf{Robustes} & \textbf{Conditionnelles} & \textbf{Indices des Images} \\
+\midrule
+\multirow{2}{*}{\texttt{spotProba4}} & \multirow{2}{*}{11 / 20 (55\%)} & \multirow{2}{*}{5 / 20 (25\%)} & $\mathcal{S}_{\text{rob}} = \{0, 2, 5, 6, 8, 9, 12, 14, 16, 18, 19\}$ \\
+ & & & $\mathcal{S}_{\text{cond}} = \{3, 4, 10, 13, 15\}$ \\
+\midrule
+\multirow{2}{*}{\texttt{spotProba5}} & \multirow{2}{*}{25 / 40 (62\%)} & \multirow{2}{*}{5 / 40 (12\%)} & $\mathcal{S}_{\text{rob}} = \{0, 2, 4, 5, 6, 8, 9, 12, 14, 15, 16, 18, 19, 20,$ \\
+ & & & \quad\qquad $22, 24, 25, 26, 28, 29, 32, 34, 35, 36, 38\}$ \\
+ & & & $\mathcal{S}_{\text{cond}} = \{1, 10, 11, 30, 39\}$ \\
+\bottomrule
+\end{tabularx}
+\caption{Classification des requêtes d'images selon leur robustesse face à la météo.}
+\label{tab:robustesse}
+\end{table}
+
+\subsection{Sensibilité à la Vitesse du Miroir \texorpdfstring{($V_I$)}{(VI)}}
+La vitesse de rotation $V_I$ du miroir conditionne le nombre de conflits cinématiques entre deux prises consécutives. Le tableau~\ref{tab:sensi_vi} montre l'évolution des conflits et du gain sur \texttt{spotProba4} quand $V_I$ varie de $0.2^\circ/\text{s}$ à $5.0^\circ/\text{s}$.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{cXXXX}
+\toprule
+\textbf{Vitesse $V_I$ ($^\circ/\text{s}$)} & \textbf{Nombre de Conflits} & \textbf{Gain $\mathbb{E}[\mathcal{Z}]$} & \textbf{Images Retenues} & \textbf{Mémoire Utilisée} \\
+\midrule
+0.2 & 158 conflits & 315.00 & 12 & 120 / 150 \\
+0.5 & 93 conflits & 330.00 & 14 & 150 / 150 \\
+1.0 (nominal) & 62 conflits & 333.00 & 14 & 140 / 150 \\
+2.0 & 50 conflits & 333.00 & 14 & 140 / 150 \\
+5.0 & 42 conflits & 333.00 & 14 & 150 / 150 \\
+\bottomrule
+\end{tabularx}
+\caption{Impact de la vitesse de rotation miroir $V_I$ sur \texttt{spotProba4} (Pessimiste).}
+\label{tab:sensi_vi}
+\end{table}
+
+Constat : En dessous de $1.0^\circ/\text{s}$, la rotation du miroir est trop lente et engendre de multiples incompatibilités (158 conflits à $0.2^\circ/\text{s}$, limitant le gain à 315.0). Au-delà de $1.0^\circ/\text{s}$, le gain ne progresse plus : la capacité mémoire devient la seule contrainte active.
+
+\subsection{Sensibilité à la Capacité Mémoire \texorpdfstring{($PM_{\max}$)}{(PMmax)}}
+Le tableau~\ref{tab:sensi_pm} illustre l'effet d'une variation de la mémoire embarquée sur \texttt{spotProba4}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{cXXXX}
+\toprule
+\textbf{Mémoire $PM_{\max}$} & \textbf{Gain $\mathbb{E}[\mathcal{Z}]$} & \textbf{Images Retenues} & \textbf{Mémoire Utilisée} & \textbf{Taux d'Occupation} \\
+\midrule
+50 & 198.00 & 5 & 50 & 100.0\% (Saturée) \\
+100 & 297.00 & 10 & 100 & 100.0\% (Saturée) \\
+150 (nominal) & 333.00 & 14 & 140 & 93.3\% \\
+200 & 339.00 & 15 & 160 & 80.0\% \\
+300 & 339.00 & 15 & 160 & 53.3\% \\
+\bottomrule
+\end{tabularx}
+\caption{Impact de la capacité mémoire $PM_{\max}$ sur \texttt{spotProba4} (Pessimiste).}
+\label{tab:sensi_pm}
+\end{table}
+
+Constat : Jusqu'à $PM_{\max}=150$, la mémoire limite directement le plan. Au-delà de $PM_{\max}=200$, le gain plafonne définitivement à 339.0 : toutes les images temporellement compatibles ont déjà été programmées.

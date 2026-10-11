@@ -1,0 +1,67 @@
+\section{Résultats et Analyse sur \texttt{spotProba4}}
+
+L'instance \texttt{spotProba4} comporte 20 demandes d'images (14 mono et 6 stéréo), avec $PM_{\max} = 150$, $DU = 20\text{ s}$ et $V_I = 1^\circ/\text{s}$. Les instruments sont fiables ($Failure = [0, 0, 0]$), mais la météo est contrastée : $p^{\sup} = 0.10$ pour les monos (météo favorable) et $p^{\sup} = 0.70$ pour les stéréos (fort risque de nuages).
+
+\subsection{Comparaison des Politiques Météo : Écart de Valeur et de Sélection}
+Le tableau~\ref{tab:spot4_comparaison} compare les résultats obtenus selon l'hypothèse météo retenue.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{lXXXXc}
+\toprule
+\textbf{Scénario Météo} & \textbf{Gain $\mathbb{E}[\mathcal{Z}]$} & \textbf{Sélection} & \textbf{Mono / Stéréo} & \textbf{Mémoire} & \textbf{Temps SCIP (ms)} \\
+\midrule
+Pessimiste (Wald) & 333.00 & 14 / 20 & 14 M / 0 S & 140 / 150 & 22.4 \\
+Moyen (Laplace) & 362.00 & 13 / 20 & 11 M / 2 S & 150 / 150 & 7.6 \\
+Optimiste (Maximax) & 400.00 & 13 / 20 & 11 M / 2 S & 150 / 150 & 6.3 \\
+Déterministe (sans nuages) & 400.00 & 13 / 20 & 11 M / 2 S & 150 / 150 & 19.8 \\
+\bottomrule
+\end{tabularx}
+\caption{Comparaison des plans obtenus sur \texttt{spotProba4} selon le critère météo.}
+\label{tab:spot4_comparaison}
+\end{table}
+
+\noindent\textit{Écart entre plan pessimiste et plan optimiste :} Les deux plans ne diffèrent pas seulement par leur valeur objective ($333.00$ contre $400.00$), mais également par la nature des images sélectionnées :
+\begin{itemize}
+    \item Plan pessimiste : 14 images retenues (14 mono et 0 stéréo), mémoire $140 / 150$. Les images sélectionnées sont $\{0, 2, 4, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 19\}$.
+    \item Plan optimiste : 13 images retenues (11 mono et 2 stéréo), mémoire saturée à $150 / 150$. Les images mono 4, 10 et 15 sont éliminées pour faire place aux 2 stéréos 3 et 13.
+\end{itemize}
+
+\subsection{Détail du Plan Optimal (Scénario Pessimiste)}
+Le tableau~\ref{tab:spot4_schedule} présente l'ordonnancement exact des 14 prises de vue dans le plan pessimiste.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{ccXcccc}
+\toprule
+\textbf{ID} & \textbf{Type} & \textbf{Instrument Alloué} & \textbf{Début (s)} & \textbf{Fin (s)} & \textbf{Gain Facial} & \textbf{$P(\text{Ciel Clair})$} \\
+\midrule
+0 & Mono & Instrument 2 (Nadir) & 200 & 220 & 10.0 & 0.90 \\
+5 & Mono & Instrument 1 (Avant) & 230 & 250 & 20.0 & 0.90 \\
+2 & Mono & Instrument 2 (Nadir) & 250 & 270 & 40.0 & 0.90 \\
+8 & Mono & Instrument 1 (Avant) & 290 & 310 & 50.0 & 0.90 \\
+4 & Mono & Instrument 2 (Nadir) & 320 & 340 & 10.0 & 0.90 \\
+12 & Mono & Instrument 1 (Avant) & 330 & 350 & 50.0 & 0.90 \\
+6 & Mono & Instrument 2 (Nadir) & 350 & 370 & 40.0 & 0.90 \\
+9 & Mono & Instrument 2 (Nadir) & 400 & 420 & 20.0 & 0.90 \\
+14 & Mono & Instrument 1 (Avant) & 420 & 440 & 20.0 & 0.90 \\
+16 & Mono & Instrument 1 (Avant) & 450 & 470 & 40.0 & 0.90 \\
+19 & Mono & Instrument 1 (Avant) & 500 & 520 & 20.0 & 0.90 \\
+10 & Mono & Instrument 3 (Arrière) & 500 & 520 & 10.0 & 0.90 \\
+15 & Mono & Instrument 2 (Nadir) & 530 & 550 & 10.0 & 0.90 \\
+18 & Mono & Instrument 2 (Nadir) & 570 & 590 & 30.0 & 0.90 \\
+\bottomrule
+\end{tabularx}
+\caption{Planning détaillé des prises de vue sur \texttt{spotProba4} (Politique Pessimiste).}
+\label{tab:spot4_schedule}
+\end{table}
+
+\subsection{Analyse causale des images écartées}
+Sur les 20 images candidates de \texttt{spotProba4}, certaines sont écartées pour des motifs précis :
+\begin{itemize}
+    \item Écartées pour cause de risque nuageux excessif (stéréos 3 et 13 en pessimiste) : Avec $p^{\sup}=0.70$, leur probabilité de ciel clair est de $0.30$. Une stéréo à gain facial 30 ne rapporte en espérance que $30 \times 0.30 = 9.0$ pour un coût mémoire de 20. Deux monos à gain 50 (images 8 et 12) rapportent $2 \times (50 \times 0.90) = 90.0$, soit dix fois plus. Le solveur écarte donc les stéréos en pessimiste.
+    \item Écartées pour cause de mémoire (monos 4, 10, 15 en optimiste) : Lorsque la météo devient favorable, le solveur préfère allouer les 40 unités de mémoire aux stéréos 3 et 13, ce qui oblige à écarter ces trois petites monos à gain facial modeste ($PA=10$).
+    \item Écartées systématiquement dans tous les scénarios (stéréos 1, 7, 11, 17) : Ces quatre stéréos ont un gain facial trop faible ($PA=10$ ou $20$) par rapport à leur coût mémoire ($PM=20$) et aux conflits temporels qu'elles engendrent simultanément sur les instruments 1 et 3.
+\end{itemize}

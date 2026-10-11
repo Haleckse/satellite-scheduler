@@ -1,0 +1,59 @@
+\section{Résultats et Analyse sur \texttt{spotProba5}}
+
+L'instance \texttt{spotProba5} comporte 40 demandes d'images, une capacité mémoire $PM_{\max} = 300$, une nébulosité variable croissante le long de la trace ($p_i^{\sup} \in [0.1, 0.7]$), et une défaillance importante sur l'instrument 3 :
+\begin{equation}
+    Failure = [0.001, \, 0.001, \, 0.70]
+\end{equation}
+
+\subsection{Comparaison des Scénarios Météo sur \texttt{spotProba5}}
+Le tableau~\ref{tab:spot5_comparaison} présente les résultats obtenus pour chaque hypothèse météorologique sous la panne nominale de l'instrument 3.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{lXXXXc}
+\toprule
+\textbf{Scénario Météo} & \textbf{Gain $\mathbb{E}[\mathcal{Z}]$} & \textbf{Sélection} & \textbf{Mono / Stéréo} & \textbf{Mémoire} & \textbf{Temps SCIP (ms)} \\
+\midrule
+Pessimiste (Wald) & 553.65 & 27 / 40 & 24 M / 3 S & 300 / 300 & 14.4 \\
+Moyen (Laplace) & 615.88 & 27 / 40 & 24 M / 3 S & 300 / 300 & 12.0 \\
+Optimiste (Maximax) & 678.12 & 27 / 40 & 24 M / 3 S & 300 / 300 & 12.3 \\
+Déterministe (sans nuages) & 789.22 & 28 / 40 & 26 M / 2 S & 300 / 300 & 10.6 \\
+\bottomrule
+\end{tabularx}
+\caption{Performances sur l'instance \texttt{spotProba5} avec panne à 70\% sur l'instrument 3.}
+\label{tab:spot5_comparaison}
+\end{table}
+
+\subsection{Déformation du plan par rapport à \texttt{spotProba4}}
+L'instrument 3 étant peu fiable ($f_2=0.70$), toute image stéréo en dépend obligatoirement. Le tableau~\ref{tab:spot5_failure_impact} met en évidence la déformation structurelle du plan par rapport à une situation sans panne.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{lXXXXc}
+\toprule
+\textbf{État de l'Instrument 3} & \textbf{Gain Espéré} & \textbf{Mono / Stéréo} & \textbf{Mémoire} & \textbf{Charge Inst. 1 / 2 / 3} \\
+\midrule
+Sans panne ($f_2 = 0$) & 621.00 & 20 M / 5 S & 300 / 300 & 12 / 10 / 8 \\
+Panne partielle ($f_2 = 0.70$) & 553.65 & 24 M / 3 S & 300 / 300 & 15 / 12 / 3 \\
+Panne totale ($f_2 = 1.00$) & 534.47 & 24 M / 0 S & 240 / 300 & 13 / 11 / 0 \\
+\bottomrule
+\end{tabularx}
+\caption{Déformation du plan d'acquisition selon le niveau de panne de l'instrument 3 (\texttt{spotProba5}).}
+\label{tab:spot5_failure_impact}
+\end{table}
+
+\noindent\textit{Analyse de la déformation :}
+\begin{itemize}
+    \item Report intégral des images mono sur les instruments 1 et 2 : L'instrument 3 ayant 70\% de risque d'échec, toute mono qui lui serait affectée verrait son gain divisé par plus de 3. Le solveur choisit donc d'affecter 0 image mono sur l'instrument 3. La totalité des 24 monos est absorbée par les instruments sains 1 (15 prises) et 2 (12 prises). Les 3 seules prises affectées à l'instrument 3 correspondent aux 3 stéréos obligées.
+    \item Sélection ciblée des stéréos à très fort gain : Alors que dans \texttt{spotProba4} aucune stéréo n'était gardée en pessimiste à cause des nuages, dans \texttt{spotProba5} le solveur retient 3 stéréos (images 1, 11 et 20) car leur gain facial élevé ($PA=40$ pour l'image 20) compense le facteur $(1-f_0)(1-f_2) \approx 0.30$ et leurs créneaux temporels n'entrent pas en conflit avec les monos majeures.
+\end{itemize}
+
+\subsection{Analyse des Images Systématiquement Écartées}
+Sur les 40 images candidates de \texttt{spotProba5}, 12 images sont systématiquement écartées quel que soit le scénario météo :
+\begin{itemize}
+    \item Écartées pour cause de risque cumulé (panne + nuage) : les images stéréo 3, 7, 13, 17, 21, 23, 27, 31, 33, 37 ont une espérance de gain trop faible pour justifier les 20 unités de mémoire et l'occupation de l'instrument 3 dégradé.
+    \item Écartées pour cause de conflit cinématique direct : certaines images mono comme l'image 27 et l'image 31 sont en conflit de dépointage miroir direct avec des images mono beaucoup plus rentables (ex: image 24 à gain 60 et image 28 à gain 50) programmées sur les mêmes créneaux.
+    \item Sous-utilisation mémoire en panne totale : en cas de panne totale ($f_2=1$), les instruments 1 et 2 ne peuvent cinématiquement réaliser que 24 images mono (mémoire $240 / 300$). Ce sont les conflits temporels entre images qui limitent le plan, et non la mémoire.
+\end{itemize}

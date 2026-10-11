@@ -1,0 +1,46 @@
+\section{Traitement de l'Incertitude}
+
+Deux facteurs aléatoires conditionnent la réussite d'une prise de vue : la météo au-dessus de la cible et la fiabilité des instruments du satellite.
+
+\subsection{Description des Incertitudes}
+\begin{itemize}
+    \item Couverture nuageuse : Une image couverte de nuages est inexploitable et n'est pas vendue. Les prévisions fournissent un intervalle de probabilité de présence de nuages $p_i^{\text{cloud}} \in [p_i^{\inf}, p_i^{\sup}]$. La probabilité d'avoir un ciel clair $p_i^{\text{clear}} = 1 - p_i^{\text{cloud}}$ appartient donc à l'intervalle $[1 - p_i^{\sup}, 1 - p_i^{\inf}]$.
+    \item Pannes matérielles : Chaque instrument $j \in \mathcal{J}$ présente une probabilité de panne $f_j \in [0, 1]$. La probabilité qu'il fonctionne correctement est donc $1 - f_j$.
+\end{itemize}
+
+\subsection{Hypothèses de décomposition de l'utilité espérée}
+Pour décomposer l'espérance de gain globale de manière additive image par image dans la fonction objectif, trois hypothèses fondamentales sont requises :
+\begin{itemize}
+    \item Indépendance météo / instrument : La nébulosité au sol et l'état matériel d'un instrument sont des événements indépendants.
+    \item Indépendance des pannes entre instruments : Les défaillances des instruments 0 et 2 sont statistiquement indépendantes, de sorte que la probabilité conjointe de bon fonctionnement pour une image stéréo est $(1 - f_0)(1 - f_2)$.
+    \item Linéarité de l'utilité financière : La valeur globale d'un ensemble d'images réussies est égale à la somme de leurs gains respectifs $PA_i$.
+\end{itemize}
+
+\subsection{Critères de décision pour la Météo}
+Face à l'intervalle $[p_i^{\inf}, p_i^{\sup}]$, plusieurs critères peuvent être appliqués pour fixer $p_i^{\text{clear}}$ :
+\begin{itemize}
+    \item Pessimiste (Wald / Maximin) : On retient la pire météo possible, soit $p_i^{\text{clear}} = 1 - p_i^{\sup}$.
+    \item Moyen (Laplace) : En l'absence de loi de probabilité \textit{a priori}, on prend la moyenne : $p_i^{\text{clear}} = 1 - \frac{p_i^{\inf} + p_i^{\sup}}{2}$.
+    \item Optimiste (Maximax) : On retient le meilleur cas possible : $p_i^{\text{clear}} = 1 - p_i^{\inf}$.
+\end{itemize}
+
+\subsection{Calcul de l'espérance de gain et fonction objectif}
+Sous ces hypothèses, l'espérance de gain s'exprime de façon unitaire :
+\begin{itemize}
+    \item Pour une image mono ($TY_i = 1$) allouée à l'instrument $j$ :
+    \begin{equation}
+        \mathbb{E}[\text{Gain}_i \mid y_{i,j}=1] = PA_i \cdot p_i^{\text{clear}} \cdot (1 - f_j)
+    \end{equation}
+    \item Pour une image stéréo ($TY_i = 2$) sélectionnée ($x_i=1$) :
+    \begin{equation}
+        \mathbb{E}[\text{Gain}_i \mid x_i=1] = PA_i \cdot p_i^{\text{clear}} \cdot (1 - f_0) \cdot (1 - f_2)
+    \end{equation}
+\end{itemize}
+
+La fonction objectif globale maximisée par SCIP s'écrit alors :
+\begin{equation}
+    \max \quad \mathbb{E}[\mathcal{Z}] = \sum_{i \in \mathcal{I}_{\text{mono}}} \sum_{j \in \mathcal{J}} \left[ PA_i \cdot p_i^{\text{clear}} \cdot (1 - f_j) \right] y_{i,j} \;+\; \sum_{i \in \mathcal{I}_{\text{stereo}}} \left[ PA_i \cdot p_i^{\text{clear}} \cdot (1 - f_0)(1 - f_2) \right] x_i \label{eq:obj}
+\end{equation}
+
+\subsection{Justification du Critère Retenu}
+Pour la planification nominale, nous retenons l'espérance de gain sous critère pessimiste. La mémoire à bord étant une ressource dure et non renouvelable, planifier une image très incertaine prive d'autres cibles sûres de pouvoir être acquises. Le critère pessimiste garantit un plan robuste et prévisible.
